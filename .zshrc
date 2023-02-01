@@ -17,7 +17,7 @@ fpath=(/usr/local/share/zsh-completions $fpath)
 ZSH_THEME="robbyrussell"
 DEFAULT_USER="$USER"
 
-plugins=(git mvn extract history-substring-search themes bundler osx rake ruby)
+plugins=(git mvn extract history-substring-search themes osx)
 
 source $ZSH/oh-my-zsh.sh
 
