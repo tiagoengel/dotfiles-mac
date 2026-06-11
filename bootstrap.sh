@@ -1,28 +1,16 @@
 #!/usr/bin/env bash
 
-cd "$(dirname "${BASH_SOURCE}")";
+# Copy dotfiles into $HOME.
 
-git pull origin master;
+cd "$(dirname "$0")"
 
-function doIt() {
-	rsync --exclude ".git/" \
-		--exclude ".DS_Store" \
-		--exclude ".osx" \
-		--exclude "bootstrap.sh" \
-		--exclude "README.md" \
-		--exclude "LICENSE-MIT.txt" \
-		--exclude "brew.sh" \
-		--exclude ".macos" \
-		-avh --no-perms . ~;
-}
+files=(.zshrc .aliases .gitconfig .gitignore .hushlogin .tmux.conf .vimrc)
 
-if [ "$1" == "--force" -o "$1" == "-f" ]; then
-	doIt;
-else
-	read -p "This may overwrite existing files in your home directory. Are you sure? (y/n) " -n 1;
-	echo "";
-	if [[ $REPLY =~ ^[Yy]$ ]]; then
-		doIt;
-	fi;
-fi;
-unset doIt;
+read -p "This will overwrite ${files[*]} in your home directory. Continue? (y/n) " -n 1
+echo ""
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+	for f in "${files[@]}"; do
+		cp -v "$f" "$HOME/$f"
+	done
+	cp -Rv .vim "$HOME/"
+fi

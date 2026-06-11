@@ -1,34 +1,38 @@
-# To activate completions, add the following to your .zshrc:
-#   fpath=(/usr/local/share/zsh-completions $fpath)
-# You may also need to force rebuild `zcompdump`:
-#   rm -f ~/.zcompdump; compinit
-# Additionally, if you receive "zsh compinit: insecure directories" warnings when attempting
-# to load these completions, you may need to run this:
-#   chmod go-w '/usr/local/share'
+# Homebrew
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Add `~/bin` to the `$PATH`
-export PATH="$HOME/bin:$PATH";
-# Path to your oh-my-zsh configuration.
-export ZSH=$HOME/.oh-my-zsh
+# History
+HISTFILE="$HOME/.zsh_history"
+HISTSIZE=50000
+SAVEHIST=50000
+setopt SHARE_HISTORY        # share history across sessions
+setopt HIST_IGNORE_ALL_DUPS # don't record duplicates
+setopt HIST_IGNORE_SPACE    # commands starting with a space stay out of history
 
-fpath=(/usr/local/share/zsh-completions $fpath)
+# Completions
+fpath=("$HOMEBREW_PREFIX/share/zsh-completions" $fpath)
+autoload -Uz compinit && compinit
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}' # case-insensitive
 
-# dircolors $HOME/.dir_colors/dircolors.256dark > /dev/null
-ZSH_THEME="robbyrussell"
-DEFAULT_USER="$USER"
+# Environment
+export EDITOR='vim'
+export LANG='en_US.UTF-8'
+export GPG_TTY=$(tty)
 
-plugins=(git mvn extract history-substring-search themes osx)
+# Prompt, smarter cd, fuzzy finder, runtime versions
+eval "$(starship init zsh)"
+eval "$(zoxide init zsh)"
+eval "$(mise activate zsh)"
+source <(fzf --zsh)
 
-source $ZSH/oh-my-zsh.sh
+# Aliases, plus machine-specific/private config in ~/.extra (never committed)
+[ -f ~/.aliases ] && source ~/.aliases
+[ -f ~/.extra ] && source ~/.extra
 
-# Load the shell dotfiles, and then some:
-# * ~/.path can be used to extend `$PATH`.
-# * ~/.extra can be used for other settings you don’t want to commit.
-for file in ~/.{path,bash_prompt,exports,aliases,functions,extra}; do
-	[ -r "$file" ] && [ -f "$file" ] && source "$file";
-done;
-unset file;
-
-#ASDF
-# source $HOME/.asdf/asdf.sh
-# source $HOME/.asdf/completions/asdf.bash
+# Plugins — syntax highlighting must be sourced last,
+# and history-substring-search right after it
+source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+source "$HOMEBREW_PREFIX/share/zsh-history-substring-search/zsh-history-substring-search.zsh"
+bindkey '^[[A' history-substring-search-up
+bindkey '^[[B' history-substring-search-down
